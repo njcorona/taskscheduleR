@@ -35,6 +35,13 @@ taskscheduler_delete(taskname = "myfancyscript")
 taskscheduler_delete(taskname = "myfancyscriptdaily")
 ```
 
+When the task has run, you can look at the log which contains everything from stdout and stderr. The log file is located at the directory where the R script is located.
+
+```
+## log file is at the place where the helloworld.R script was located
+system.file("extdata", "helloworld.log", package = "taskscheduleR")
+```
+
 
 Install
 -----------
