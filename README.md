@@ -1,7 +1,10 @@
 taskscheduleR
 =========
 
+![taskscheduleR](inst/img/taskscheduleR-logo.png) 
+
 Schedule R scripts/processes with the Windows task scheduler. This allows R users working on Windows to automate R processes on specific timepoints from R itself.
+
 
 Basic usage
 -----------
