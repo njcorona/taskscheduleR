@@ -9,7 +9,7 @@ Schedule R scripts/processes with the Windows task scheduler. This allows R user
 Basic usage
 -----------
 
-The package allows to 
+This R package allows to 
 * Get the list of scheduled tasks
 * Remove a task
 * Add a task
