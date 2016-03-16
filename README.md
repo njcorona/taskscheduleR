@@ -20,6 +20,7 @@ This R package allows to
 Example usage:
 
 ```
+library(taskscheduleR)
 myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 
 ## run script once within 62 seconds
