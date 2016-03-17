@@ -30,6 +30,10 @@ taskscheduler_create(taskname = "myfancyscript", rscript = myscript,
 taskscheduler_create(taskname = "myfancyscriptdaily", rscript = myscript, 
   schedule = "DAILY", starttime = "09:10")
 
+## get a data.frame of all tasks
+tasks <- taskscheduler_ls()
+str(tasks)
+
 ## delete the tasks
 taskscheduler_delete(taskname = "myfancyscript")
 taskscheduler_delete(taskname = "myfancyscriptdaily")
