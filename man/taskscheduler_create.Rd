@@ -11,7 +11,7 @@ taskscheduler_create(taskname = basename(rscript), rscript,
   "WED", "THU", "FRI", "SAT", "SUN", 1:31), months = c("*", "JAN", "FEB",
   "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"),
   modifier, idletime = 60L, Rexe = file.path(Sys.getenv("R_HOME"), "bin",
-  "Rscript.exe"), debug = FALSE)
+  "Rscript.exe"), rscript_args = "", schtasks_extra = "", debug = FALSE)
 }
 \arguments{
 \item{taskname}{a character string with the name of the task. Defaults to the filename. Should not contain any spaces.}
@@ -38,6 +38,10 @@ are * (all months), 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP
 running a scheduled ONIDLE task. The valid range is 1 - 999 minutes.}
 
 \item{Rexe}{path to Rscript.exe which will be used to run the script. Defaults to Rscript at the bin folder of R_HOME.}
+
+\item{rscript_args}{character string with further arguments passed on to Rscript. See args in \code{\link{Rscript}}.}
+
+\item{schtasks_extra}{character string with further schtasks arguments. See the inst/docs/schtasks.pdf}
 
 \item{debug}{logical to print the system call to screen}
 }
