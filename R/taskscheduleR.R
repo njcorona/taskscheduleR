@@ -3,14 +3,12 @@
 #' @title Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' @description Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' 
-#' @param author a character vector of authors (the Author column) indicating who created the task (e.g. admin, yourusername).
-#' Defaults to all authors.
 #' @return a data.frame with scheduled tasks as returned by schtasks /Query
 #' @export
 #' @examples 
 #' x <- taskscheduler_ls()
 #' x
-taskscheduler_ls <- function(author){
+taskscheduler_ls <- function(){
   cmd <- sprintf('schtasks /Query /FO CSV /V')
   x <- system(cmd, intern = TRUE)
   f <- tempfile()
@@ -18,9 +16,6 @@ taskscheduler_ls <- function(author){
   x <- data.table::fread(f)
   x <- data.table::setDF(x)
   try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)
-  if(!missing(author)){
-    try(x <- x[x$Author %in% author, ], silent = TRUE)
-  }
   on.exit(file.remove(f))
   x
 }
@@ -86,12 +81,12 @@ taskscheduler_create <- function(taskname = basename(rscript),
   months <- match.arg(months)
   
   taskname <- force(taskname)
-  if(length(grep(" ", "", taskname)) > 0){
+  if(length(grep(" ", taskname)) > 0){
     taskname <- gsub(" ", "-", taskname)  
     message(sprintf("No spaces are allowed in taskname, changing the name of the task to %s", taskname))
   }
-  if(length(grep(" ", "", rscript)) > 0){
-    warning("Filename contains spaces, remove these from '%s'", rscript)
+  if(length(grep(" ", rscript)) > 0){
+    stop(sprintf("Full path to filename '%s' contains spaces, put your script in another location which contains no spaces", rscript))
   }
   task <- sprintf("cmd /c %s %s %s >> %s.log 2>&1", Rexe, rscript, rscript_args, tools::file_path_sans_ext(rscript))
   cmd <- sprintf('schtasks /Create /TN %s /TR %s /SC %s', 

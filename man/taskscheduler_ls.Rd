@@ -4,11 +4,7 @@
 \alias{taskscheduler_ls}
 \title{Get all the tasks which are currently scheduled at the Windows task scheduler.}
 \usage{
-taskscheduler_ls(author)
-}
-\arguments{
-\item{author}{a character vector of authors (the Author column) indicating who created the task (e.g. admin, yourusername).
-Defaults to all authors.}
+taskscheduler_ls()
 }
 \value{
 a data.frame with scheduled tasks as returned by schtasks /Query
