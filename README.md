@@ -54,3 +54,10 @@ Install the latest version from github:
 ```
 devtools::install_github("jwijffels/taskscheduleR")
 ```
+
+Or from www.datatailor.be
+```
+install.packages('data.table')
+install.packages('knitr')
+install.packages("taskscheduleR", repos = "http://www.datatailor.be/rcube", type = "source")
+```

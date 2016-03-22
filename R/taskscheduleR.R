@@ -3,24 +3,19 @@
 #' @title Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' @description Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' 
-#' @param author a character vector of authors (the Author column) indicating who created the task (e.g. admin, yourusername).
-#' Defaults to all authors.
 #' @return a data.frame with scheduled tasks as returned by schtasks /Query
 #' @export
 #' @examples 
 #' x <- taskscheduler_ls()
 #' x
-taskscheduler_ls <- function(author){
+taskscheduler_ls <- function(){
   cmd <- sprintf('schtasks /Query /FO CSV /V')
   x <- system(cmd, intern = TRUE)
   f <- tempfile()
   writeLines(x, f)
   x <- data.table::fread(f)
   x <- data.table::setDF(x)
-  x$TaskName <- gsub("^\\\\", "", x$TaskName)
-  if(!missing(author)){
-    x <- x[x$Author %in% author, ]
-  }
+  try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)
   on.exit(file.remove(f))
   x
 }
@@ -47,6 +42,8 @@ taskscheduler_ls <- function(author){
 #' @param idletime integer containing a value that specifies the amount of idle time to wait before 
 #' running a scheduled ONIDLE task. The valid range is 1 - 999 minutes.
 #' @param Rexe path to Rscript.exe which will be used to run the script. Defaults to Rscript at the bin folder of R_HOME.
+#' @param rscript_args character string with further arguments passed on to Rscript. See args in \code{\link{Rscript}}.
+#' @param schtasks_extra character string with further schtasks arguments. See the inst/docs/schtasks.pdf 
 #' @param debug logical to print the system call to screen
 #' @return the system call to schtasks /Create 
 #' @export
@@ -72,6 +69,8 @@ taskscheduler_create <- function(taskname = basename(rscript),
                                  modifier,
                                  idletime = 60L,
                                  Rexe = file.path(Sys.getenv("R_HOME"), "bin", "Rscript.exe"),
+                                 rscript_args = "",
+                                 schtasks_extra = "",
                                  debug = FALSE){
   stopifnot(file.exists(rscript))
   if(basename(rscript) == rscript){
@@ -82,14 +81,14 @@ taskscheduler_create <- function(taskname = basename(rscript),
   months <- match.arg(months)
   
   taskname <- force(taskname)
-  if(length(grep(" ", "", taskname)) > 0){
+  if(length(grep(" ", taskname)) > 0){
     taskname <- gsub(" ", "-", taskname)  
     message(sprintf("No spaces are allowed in taskname, changing the name of the task to %s", taskname))
   }
-  if(length(grep(" ", "", rscript)) > 0){
-    warning("Filename contains spaces, remove these from '%s'", rscript)
+  if(length(grep(" ", rscript)) > 0){
+    stop(sprintf("Full path to filename '%s' contains spaces, put your script in another location which contains no spaces", rscript))
   }
-  task <- sprintf("cmd /c %s %s >> %s.log 2>&1", Rexe, rscript, tools::file_path_sans_ext(rscript))
+  task <- sprintf("cmd /c %s %s %s >> %s.log 2>&1", Rexe, rscript, rscript_args, tools::file_path_sans_ext(rscript))
   cmd <- sprintf('schtasks /Create /TN %s /TR %s /SC %s', 
                  shQuote(taskname, type = "cmd"), 
                  shQuote(task, type = "cmd"),
@@ -112,6 +111,7 @@ taskscheduler_create <- function(taskname = basename(rscript),
   if(schedule %in% c('MONTHLY')){
     cmd <- sprintf("%s /M %s", cmd, months)
   }
+  cmd <- sprintf("%s %s", cmd, schtasks_extra)
   if(debug){
     message(sprintf("Creating task schedule: %s", cmd))  
   }
