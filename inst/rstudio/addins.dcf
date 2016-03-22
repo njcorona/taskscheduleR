@@ -1,0 +1,4 @@
+Name: Schedule Rscripts
+Description: Easily scheduling Rscripts
+Binding: taskschedulerAddin
+Interactive: true
