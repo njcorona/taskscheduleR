@@ -46,6 +46,10 @@ When the task has run, you can look at the log which contains everything from st
 system.file("extdata", "helloworld.log", package = "taskscheduleR")
 ```
 
+The package contains also an RStudio add-in. If you install the package and use RStudio version 0.99.893 or later. Just click Addins > Schedule Rscripts. Many thanks to ![OliverBLMS](https://github.com/OliverBLMS) 
+
+![taskscheduleR](inst/img/taskscheduleR-rstudioaddin.png) 
+
 
 Install
 -----------
@@ -60,4 +64,10 @@ Or from www.datatailor.be
 install.packages('data.table')
 install.packages('knitr')
 install.packages("taskscheduleR", repos = "http://www.datatailor.be/rcube", type = "source")
+```
+
+If you want the RStudio add-in to work, also install miniUI and shiny
+```
+install.packages('miniUI')
+install.packages('shiny')
 ```
