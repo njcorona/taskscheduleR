@@ -26,6 +26,14 @@ taskschedulerAddin <- function(RscriptRepository,
   if(length(grep(" ", RscriptRepository)) > 0){
     stop(sprintf("Make sure the RscriptRepository does not contain spaces, change argument %s to another location on your drive which contains no spaces", RscriptRepository))
   }
+  local_dateformat <- file.path(system.file("extdata", package="taskscheduleR"), "dateformat.rds")
+  if(file.exists(local_dateformat)){
+    datefmt <- readRDS(file = local_dateformat)
+  }else{
+    datefmt <- "%d/%m/%Y"
+    saveRDS(datefmt, file = local_dateformat)
+  }
+  
   check <- NULL
   
   ui <- miniUI::miniPage(
@@ -57,7 +65,8 @@ taskschedulerAddin <- function(RscriptRepository,
                                              shiny::fillCol(
                                                shiny::dateInput('date', label = "Start date:", startview = "month", weekstart = 1, min = Sys.Date()),
                                                shiny::textInput('hour', label = "Hour start", value = format(Sys.time() + 122, "%H:%M")),
-                                               shiny::textInput('rscript_args', label = "Additional arguments to Rscript", value = "")
+                                               shiny::textInput('rscript_args', label = "Additional arguments to Rscript", value = ""),
+                                               shiny::textInput('date_fmt', label = "Date format of your locale", value = datefmt)
                                              ))
                              )
                            ),
@@ -115,6 +124,11 @@ taskschedulerAddin <- function(RscriptRepository,
         }
       })
     })
+    # When date format has been changed
+    shiny::observeEvent(input$date_fmt, {
+      datefmt <<- input$date_fmt
+      saveRDS(datefmt, file = local_dateformat)
+    })
     
     ###########################
     # CREATE / OVERWRITE
@@ -124,11 +138,12 @@ taskschedulerAddin <- function(RscriptRepository,
       shiny::req(input$file)
       
       if(input$task == "MONTHLY" ){
-        days <- format(input$date, "%d")
+        days <- as.integer(format(input$date, "%d"))
       }
       else if(input$task == "WEEKLY"){
         weekdays <- c("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
-        days <- weekdays[as.integer(format(input$date, "%w"))]
+        idx <- as.integer(format(input$date, "%w"))
+        days <- weekdays[ifelse(idx == 0, 7, idx)]
       }
       else {
         # get default value by setting days to null.
@@ -150,9 +165,9 @@ taskschedulerAddin <- function(RscriptRepository,
       ##
       if(check){
         taskscheduler_delete(taskname = input$file$name)
-        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$task, startdate = format(input$date, "%d/%m/%Y"), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
+        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$task, startdate = format(input$date, input$date_fmt), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
       } else {
-        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$task, startdate = format(input$date, "%d/%m/%Y"), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
+        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$task, startdate = format(input$date, input$date_fmt), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
       }
       
       # Reset ui inputs

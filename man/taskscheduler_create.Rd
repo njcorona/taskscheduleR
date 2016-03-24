@@ -24,7 +24,7 @@ Either one of 'ONCE', 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE', 'ONLOGON
 \item{starttime}{a timepoint in HH:mm format indicating when to run the script. Defaults to within 62 seconds.}
 
 \item{startdate}{a date that specifies the first date on which to run the task.
-Only applicable if schedule is of type 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE'. Defaults to today.}
+Only applicable if schedule is of type 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE'. Defaults to today in '\%d/\%m/\%Y' format. Change to your locale format if needed.}
 
 \item{days}{character string with days on which to run the script if schedule is 'WEEKLY' or 'MONTHLY'. Possible values
 are * (all days), 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN', 1:31.}

@@ -26,9 +26,9 @@ myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 ## run script once within 62 seconds
 taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
   schedule = "ONCE", starttime = format(Sys.time() + 62, "%H:%M"))
-## run script every day at 09:10
+## run script every day at 09:10. Change the format of startdate to your locale if needed (e.g. US: %m/%d/%Y)
 taskscheduler_create(taskname = "myfancyscriptdaily", rscript = myscript, 
-  schedule = "DAILY", starttime = "09:10")
+  schedule = "DAILY", starttime = "09:10", startdate = format(Sys.Date(), "%d/%m/%Y"))
 
 ## get a data.frame of all tasks
 tasks <- taskscheduler_ls()
@@ -53,6 +53,7 @@ The package contains also an RStudio add-in. If you install the package and use 
 
 ![taskscheduleR](inst/img/taskscheduleR-rstudioaddin.png) 
 
+Mark that the date format is the date format in Belgium. Change once to your locale if needed. E.g. in the US %m/%d/%Y
 
 Install
 -----------
