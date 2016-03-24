@@ -10,9 +10,22 @@
 #' \dontrun{
 #' taskschedulerAddin()
 #' }
-taskschedulerAddin <- function(RscriptRepository = system.file("extdata", package="taskscheduleR"), debug = TRUE) {
+taskschedulerAddin <- function(RscriptRepository, 
+                               debug = TRUE) {
   library("shiny")
   library("miniUI")
+  current_repo <- file.path(system.file("extdata", package="taskscheduleR"), "RscriptRepository.rds")
+  if(missing(RscriptRepository)){
+    if(file.exists(current_repo)){
+      RscriptRepository <- readRDS(file = current_repo)
+    }else{
+      RscriptRepository <- system.file("extdata", package="taskscheduleR")
+      saveRDS(RscriptRepository, file = current_repo)
+    }
+  }
+  if(length(grep(" ", RscriptRepository)) > 0){
+    stop(sprintf("Make sure the RscriptRepository does not contain spaces, change argument %s to another location on your drive which contains no spaces", RscriptRepository))
+  }
   check <- NULL
   
   ui <- miniUI::miniPage(
@@ -32,11 +45,13 @@ taskschedulerAddin <- function(RscriptRepository = system.file("extdata", packag
     miniUI::miniTabstripPanel(
       miniUI::miniTabPanel(title = 'Upload and create', icon = shiny::icon("cloud-upload"),
                            miniUI::miniContentPanel(
-                             shiny::fillCol(flex = c(1, 2),
+                             shiny::fillCol(flex = c(1, 1, 3),
                                      shiny::fillRow(
                                        shiny::uiOutput('fileSelect'),
                                        miniUI::miniContentPanel(padding = 0, shiny::strong("Task checking: does the task already exist?"), shiny::textOutput("text"))
                                      ),
+                                     shiny::fillRow(flex = 1,
+                                                    shiny::textInput('rscript_repository', label = "Rscript repo: location where Rscripts will be copied to schedule + location of logs", value = RscriptRepository)),
                                      shiny::fillRow(flex = c(3, 3), 
                                                     shiny::radioButtons('task', label = "Schedule:", choices = c( 'ONCE', 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE', 'ONLOGON', 'ONIDLE')),
                                              shiny::fillCol(
@@ -89,6 +104,18 @@ taskschedulerAddin <- function(RscriptRepository = system.file("extdata", packag
       })
     })
     
+    # When path to Rscript repository has been changed
+    shiny::observeEvent(input$rscript_repository, {
+      RscriptRepository <<- normalizePath(input$rscript_repository, winslash = "/")
+      output$text <- shiny::renderText({
+        if(file.exists(RscriptRepository) && file.info(RscriptRepository)$isdir == TRUE){
+          saveRDS(RscriptRepository, file = current_repo)
+        } else {
+          sprintf("RscriptRepository %s does not exist, make sure this is an existing directory without spaces", RscriptRepository)
+        }
+      })
+    })
+    
     ###########################
     # CREATE / OVERWRITE
     ###########################
@@ -113,13 +140,8 @@ taskschedulerAddin <- function(RscriptRepository = system.file("extdata", packag
       ##
       ## Copy the uploaded file from the webapp to the main folder to store the scheduled rscripts.
       ##
-      inputPath <- sprintf(input$file$datapath, input$file$name)
-      outputPath <- paste0(RscriptRepository, "/", input$file$name)
-      done <-  file.copy(inputPath,  outputPath, overwrite = TRUE)
-      myscript <- outputPath
-      #myscript <- file.path(RscriptRepository, input$file$name)
-      #done <- file.copy(from = file.path(input$file$datapath, input$file$name), 
-      #          to = myscript, overwrite = TRUE)
+      myscript <- paste0(RscriptRepository, "/", input$file$name)
+      done <-  file.copy(input$file$datapath, myscript, overwrite = TRUE)
       if(!done){
         stop(sprintf('Copying file %s to %s failed. Do you have access rights to %s?', file.path(input$file$datapath, input$file$name), myscript, dirname(myscript)))
       }
@@ -188,6 +210,11 @@ taskschedulerAddin <- function(RscriptRepository = system.file("extdata", packag
   }
   
   # Use a modal dialog as a viewr.
-  viewer <- shiny::dialogViewer("Task ScheduleR", width = 700, height = 550)
+  viewer <- shiny::dialogViewer("Task ScheduleR", width = 700, height = 600)
   shiny::runGadget(ui, server, viewer = viewer)
+}
+
+
+taskschedulerAddin_setRscriptRepository <- function(){
+  
 }

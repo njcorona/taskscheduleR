@@ -4,8 +4,7 @@
 \alias{taskschedulerAddin}
 \title{Launch an RStudio addin which allows to schedule an Rscript interactively.}
 \usage{
-taskschedulerAddin(RscriptRepository = system.file("extdata", package =
-  "taskscheduleR"), debug = TRUE)
+taskschedulerAddin(RscriptRepository, debug = TRUE)
 }
 \arguments{
 \item{RscriptRepository}{path to the folder where R scripts will be copied to and launched. Defaults to the extdata folder in the taskscheduleR R library}
