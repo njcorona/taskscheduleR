@@ -138,7 +138,7 @@ taskschedulerAddin <- function(RscriptRepository,
       shiny::req(input$file)
       
       if(input$task == "MONTHLY" ){
-        days <- as.integer(format(input$date, "%d"))
+        days <- format(input$date, "%d")
       }
       else if(input$task == "WEEKLY"){
         weekdays <- c("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
