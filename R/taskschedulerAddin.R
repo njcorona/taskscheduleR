@@ -214,7 +214,3 @@ taskschedulerAddin <- function(RscriptRepository,
   shiny::runGadget(ui, server, viewer = viewer)
 }
 
-
-taskschedulerAddin_setRscriptRepository <- function(){
-  
-}
