@@ -23,9 +23,6 @@ taskschedulerAddin <- function(RscriptRepository,
       saveRDS(RscriptRepository, file = current_repo)
     }
   }
-  if(length(grep(" ", RscriptRepository)) > 0){
-    stop(sprintf("Make sure the RscriptRepository does not contain spaces, change argument %s to another location on your drive which contains no spaces", RscriptRepository))
-  }
   local_dateformat <- file.path(system.file("extdata", package="taskscheduleR"), "dateformat.rds")
   if(file.exists(local_dateformat)){
     datefmt <- readRDS(file = local_dateformat)
@@ -155,6 +152,9 @@ taskschedulerAddin <- function(RscriptRepository,
       ##
       ## Copy the uploaded file from the webapp to the main folder to store the scheduled rscripts.
       ##
+      if(length(grep(" ", RscriptRepository)) > 0){
+        stop(sprintf("Make sure the RscriptRepository does not contain spaces, change argument %s to another location on your drive which contains no spaces", RscriptRepository))
+      }
       myscript <- paste0(RscriptRepository, "/", input$file$name)
       done <-  file.copy(input$file$datapath, myscript, overwrite = TRUE)
       if(!done){
