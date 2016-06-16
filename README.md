@@ -50,7 +50,7 @@ system.file("extdata", "helloworld.log", package = "taskscheduleR")
 RStudio add-in
 -----------
 
-The package contains also an RStudio add-in. If you install the package and use RStudio version 0.99.893 or later you can just click to schedule a task. Just click Addins > Schedule Rscripts. Many thanks to ![OliverBLMS](https://github.com/OliverBLMS) 
+The package contains also an RStudio add-in. If you install the package and use RStudio version 0.99.893 or later you can just click to schedule a task. Just click Addins > Schedule R scripts on Windows. Many thanks to ![OliverBLMS](https://github.com/OliverBLMS) 
 
 ![taskscheduleR](inst/img/taskscheduleR-rstudioaddin.png) 
 
