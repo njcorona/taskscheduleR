@@ -71,5 +71,5 @@ Install
 
 Install the latest version from github:
 ```
-devtools::install_github("jwijffels/taskscheduleR")
+devtools::install_github("bnosac/taskscheduleR")
 ```

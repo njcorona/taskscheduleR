@@ -4,7 +4,7 @@ taskscheduleR
 ![taskscheduleR](inst/img/taskscheduleR-logo.png) 
 
 Schedule R scripts/processes with the Windows task scheduler. This allows R users working on Windows to automate R processes on specific timepoints from R itself.
-Mark that if you are looking for a Linux/Unix scheduler, you might be interested in the R package cronR available at https://github.com/jwijffels/cronR
+Mark that if you are looking for a Linux/Unix scheduler, you might be interested in the R package cronR available at https://github.com/bnosac/cronR
 
 
 Basic usage
@@ -61,7 +61,7 @@ Install
 
 Install the latest version from github:
 ```
-devtools::install_github("jwijffels/taskscheduleR")
+devtools::install_github("bnosac/taskscheduleR")
 ```
 
 Or from www.datatailor.be
