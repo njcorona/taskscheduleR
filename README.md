@@ -76,3 +76,10 @@ If you want the RStudio add-in to work, also install miniUI and shiny
 install.packages('miniUI')
 install.packages('shiny')
 ```
+
+Mark on administrator rights
+-----------
+
+By default, to schedule a task, you must be a member of the Administrators, Backup Operators, or Server Operators group on the local computer.
+If you are not, you can ask your System administrator to make sure you have the rights to execute Schtasks.exe. This is the application this R package connects to.
+Schtasks.exe enables an administrator to create, delete, query, change, run and end scheduled tasks on a local or remote computer.
