@@ -3,6 +3,8 @@
 ##
 print(sprintf("Now: %s", Sys.time()))
 print(sprintf("Running helloworld.R, working directory = %s", getwd()))
+print("-------Command line arguments-------")
+print(commandArgs())
 print("-------LIBPATHS-------")
 print(.libPaths())
 print("-------ENVIRONMENT VARIABLES-------")

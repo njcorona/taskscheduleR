@@ -12,8 +12,8 @@
 #' }
 taskschedulerAddin <- function(RscriptRepository, 
                                debug = TRUE) {
-  library("shiny")
-  library("miniUI")
+  requireNamespace("shiny")
+  requireNamespace("miniUI")
   current_repo <- file.path(system.file("extdata", package="taskscheduleR"), "RscriptRepository.rds")
   if(missing(RscriptRepository)){
     if(file.exists(current_repo)){

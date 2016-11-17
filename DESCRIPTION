@@ -1,6 +1,6 @@
 Package: taskscheduleR
 Type: Package
-Title: Schedule R scripts/processes with the Windows task scheduler.
+Title: Schedule R scripts/processes with the Windows task scheduler
 Description: Schedule R scripts/processes with the Windows task scheduler. This
     allows R users to automate R processes on specific timepoints from R itself.
 Author: Jan Wijffels <jwijffels@bnosac.be>
