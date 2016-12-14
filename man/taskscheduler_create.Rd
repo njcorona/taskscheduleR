@@ -83,7 +83,9 @@ taskscheduler_create(taskname = "myfancyscript_withargs_b", rscript = myscript,
   schedule = "MINUTE", rscript_args = c("productabc", "20150101"))
   
 alltasks <- taskscheduler_ls()
+\dontrun{
 subset(alltasks, TaskName \%in\% c("myfancyscript", "myfancyscriptdaily"))
+}
 
 taskscheduler_delete(taskname = "myfancyscript")
 taskscheduler_delete(taskname = "myfancyscriptdaily")

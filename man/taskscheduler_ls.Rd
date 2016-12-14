@@ -4,7 +4,10 @@
 \alias{taskscheduler_ls}
 \title{Get all the tasks which are currently scheduled at the Windows task scheduler.}
 \usage{
-taskscheduler_ls()
+taskscheduler_ls(...)
+}
+\arguments{
+\item{...}{optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates}
 }
 \value{
 a data.frame with scheduled tasks as returned by schtasks /Query

@@ -4,7 +4,7 @@
 \name{taskscheduleR-package}
 \alias{taskscheduleR}
 \alias{taskscheduleR-package}
-\title{Schedule R scripts/processes with the Windows task scheduler.}
+\title{Schedule R Scripts/Processes with the Windows Task Scheduler}
 \description{
 Schedule R scripts/processes with the Windows task scheduler. This allows R users to automate R processes on specific timepoints from R itself.
 The package is basically a wrapper around the Schtasks.exe functionality. 

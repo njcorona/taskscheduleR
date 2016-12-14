@@ -4,16 +4,17 @@
 #' @description Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' 
 #' @return a data.frame with scheduled tasks as returned by schtasks /Query
+#' @param ... optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates
 #' @export
 #' @examples 
 #' x <- taskscheduler_ls()
 #' x
-taskscheduler_ls <- function(){
+taskscheduler_ls <- function(...){
   cmd <- sprintf('schtasks /Query /FO CSV /V')
   x <- system(cmd, intern = TRUE)
   f <- tempfile()
   writeLines(x, f)
-  x <- data.table::fread(f)
+  x <- data.table::fread(f, ...)
   x <- data.table::setDF(x)
   try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)
   on.exit(file.remove(f))
@@ -76,7 +77,9 @@ taskscheduler_ls <- function(){
 #'   schedule = "MINUTE", rscript_args = c("productabc", "20150101"))
 #'   
 #' alltasks <- taskscheduler_ls()
+#' \dontrun{
 #' subset(alltasks, TaskName %in% c("myfancyscript", "myfancyscriptdaily"))
+#' }
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
 #' taskscheduler_delete(taskname = "myfancyscriptdaily")
