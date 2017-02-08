@@ -105,3 +105,10 @@ Mark on administrator rights
 By default, to schedule a task, you must be a member of the Administrators, Backup Operators, or Server Operators group on the local computer.
 If you are not, you can ask your System administrator to make sure you have the rights to execute Schtasks.exe. This is the application this R package connects to.
 Schtasks.exe enables an administrator to create, delete, query, change, run and end scheduled tasks on a local or remote computer.
+If you are using RStudio, you might need to start RStudio as admin, on Windows this is rightclick >> run as administrator.
+
+Mark on error messages
+-----------
+
+You can only have one task with the same name, make sure you use taskscheduler_delete the task if you are planning to create a new task with the same name.
+

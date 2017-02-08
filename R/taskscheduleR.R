@@ -123,6 +123,9 @@ taskscheduler_create <- function(taskname = basename(rscript),
     stop(sprintf("Full path to filename '%s' contains spaces, put your script in another location which contains no spaces", rscript))
   }
   task <- sprintf("cmd /c %s %s %s >> %s.log 2>&1", Rexe, rscript, paste(rscript_args, collapse = " "), tools::file_path_sans_ext(rscript))
+  if(nchar(task) > 260){
+    warning(sprintf("Passing on this to the TR argument of schtasks.exe: %s, this is too long. Consider putting your scripts into another folder", task))
+  }
   cmd <- sprintf('schtasks /Create /TN %s /TR %s /SC %s', 
                  shQuote(taskname, type = "cmd"), 
                  shQuote(task, type = "cmd"),
