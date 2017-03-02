@@ -3,7 +3,8 @@
 #' @title Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' @description Get all the tasks which are currently scheduled at the Windows task scheduler.
 #' 
-#' @return a data.frame with scheduled tasks as returned by schtasks /Query
+#' @return a data.frame with scheduled tasks as returned by schtasks /Query for which the Taskname or second
+#' column in the dataset the preceding \\ is removed
 #' @param ... optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates
 #' @export
 #' @examples 
@@ -16,7 +17,11 @@ taskscheduler_ls <- function(...){
   writeLines(x, f)
   x <- data.table::fread(f, ...)
   x <- data.table::setDF(x)
-  try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)
+  if("TaskName" %in% names(x)){
+    try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)  
+  }else{
+    try(x[, 2] <- gsub("^\\\\", "", x[, 2]), silent = TRUE)  
+  }
   on.exit(file.remove(f))
   x
 }

@@ -10,7 +10,8 @@ taskscheduler_ls(...)
 \item{...}{optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates}
 }
 \value{
-a data.frame with scheduled tasks as returned by schtasks /Query
+a data.frame with scheduled tasks as returned by schtasks /Query for which the Taskname or second
+column in the dataset the preceding \\ is removed
 }
 \description{
 Get all the tasks which are currently scheduled at the Windows task scheduler.
