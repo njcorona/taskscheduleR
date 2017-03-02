@@ -52,6 +52,7 @@ taskscheduler_ls <- function(...){
 #' myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 #' cat(readLines(myscript), sep = "\n")
 #' 
+#' \dontrun{
 #' ## Run script once at a specific timepoint (within 62 seconds)
 #' runon <- format(Sys.time() + 62, "%H:%M")
 #' taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
@@ -77,9 +78,8 @@ taskscheduler_ls <- function(...){
 #'   schedule = "MINUTE", rscript_args = c("productabc", "20150101"))
 #'   
 #' alltasks <- taskscheduler_ls()
-#' \dontrun{
 #' subset(alltasks, TaskName %in% c("myfancyscript", "myfancyscriptdaily"))
-#' }
+#' # The field TaskName might have been different on Windows with non-english language locale
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
 #' taskscheduler_delete(taskname = "myfancyscriptdaily")
@@ -91,6 +91,7 @@ taskscheduler_ls <- function(...){
 #' ## Have a look at the log
 #' mylog <- system.file("extdata", "helloworld.log", package = "taskscheduleR")
 #' cat(readLines(mylog), sep = "\n")
+#' }
 taskscheduler_create <- function(taskname = basename(rscript), 
                                  rscript,
                                  schedule = c('ONCE', 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE', 'ONLOGON', 'ONIDLE'),
@@ -120,9 +121,9 @@ taskscheduler_create <- function(taskname = basename(rscript),
     message(sprintf("No spaces are allowed in taskname, changing the name of the task to %s", taskname))
   }
   if(length(grep(" ", rscript)) > 0){
-    stop(sprintf("Full path to filename '%s' contains spaces, put your script in another location which contains no spaces", rscript))
+    message(sprintf("Full path to filename '%s' contains spaces, it is advised to put your script in another location which contains no spaces", rscript))
   }
-  task <- sprintf("cmd /c %s %s %s >> %s.log 2>&1", Rexe, rscript, paste(rscript_args, collapse = " "), tools::file_path_sans_ext(rscript))
+  task <- sprintf("cmd /c %s %s %s >> %s 2>&1", Rexe, shQuote(rscript), paste(rscript_args, collapse = " "), shQuote(sprintf("%s.log", tools::file_path_sans_ext(rscript))))
   if(nchar(task) > 260){
     warning(sprintf("Passing on this to the TR argument of schtasks.exe: %s, this is too long. Consider putting your scripts into another folder", task))
   }
@@ -163,10 +164,11 @@ taskscheduler_create <- function(taskname = basename(rscript),
 #' @return the system call to schtasks /Delete 
 #' @export
 #' @examples 
+#' \dontrun{
 #' x <- taskscheduler_ls()
 #' x
-#' task <- x$TaskName[1]
-#' \dontrun{
+#' # The field TaskName might have been different on Windows with non-english language locale
+#' task <- x$TaskName[1] 
 #' taskscheduler_delete(taskname = task)
 #' }
 taskscheduler_delete <- function(taskname){
@@ -183,6 +185,7 @@ taskscheduler_delete <- function(taskname){
 #' @return the system call to schtasks /Run 
 #' @export
 #' @examples 
+#' \dontrun{
 #' myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 #' taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
 #'  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "%H:%M"))
@@ -193,6 +196,7 @@ taskscheduler_delete <- function(taskname){
 #' 
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
+#' }
 taskcheduler_runnow <- function(taskname){
   cmd <- sprintf('schtasks /Run /TN %s', shQuote(taskname, type = "cmd"))
   system(cmd, intern = FALSE)
@@ -206,6 +210,7 @@ taskcheduler_runnow <- function(taskname){
 #' @return the system call to schtasks /End 
 #' @export
 #' @examples 
+#' \dontrun{
 #' myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 #' taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
 #'  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "%H:%M"))
@@ -216,6 +221,7 @@ taskcheduler_runnow <- function(taskname){
 #' 
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
+#' }
 taskcheduler_stop <- function(taskname){
   cmd <- sprintf('schtasks /End /TN %s', shQuote(taskname, type = "cmd"))
   system(cmd, intern = FALSE)

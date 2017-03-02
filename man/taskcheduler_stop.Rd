@@ -16,6 +16,7 @@ the system call to schtasks /End
 Stop the run of a specific task which is running in the Windows task scheduler.
 }
 \examples{
+\dontrun{
 myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "\%H:\%M"))
@@ -26,5 +27,6 @@ taskcheduler_stop("myfancyscript")
 
 
 taskscheduler_delete(taskname = "myfancyscript")
+}
 }
 

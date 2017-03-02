@@ -16,6 +16,7 @@ the system call to schtasks /Run
 Immediately run a specific task available in the Windows task scheduler.
 }
 \examples{
+\dontrun{
 myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "\%H:\%M"))
@@ -26,5 +27,6 @@ taskcheduler_stop("myfancyscript")
 
 
 taskscheduler_delete(taskname = "myfancyscript")
+}
 }
 

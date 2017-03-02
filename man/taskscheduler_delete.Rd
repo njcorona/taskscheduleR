@@ -16,10 +16,11 @@ the system call to schtasks /Delete
 Delete a specific task which was scheduled in the Windows task scheduler.
 }
 \examples{
+\dontrun{
 x <- taskscheduler_ls()
 x
-task <- x$TaskName[1]
-\dontrun{
+# The field TaskName might have been different on Windows with non-english language locale
+task <- x$TaskName[1] 
 taskscheduler_delete(taskname = task)
 }
 }

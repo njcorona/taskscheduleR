@@ -35,7 +35,7 @@ The package allows to
 Example usage:
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(comment = "#>", collapse = TRUE)
+knitr::opts_chunk$set(comment = "#>", collapse = TRUE, eval = FALSE)
 ```
 
 ```{r}

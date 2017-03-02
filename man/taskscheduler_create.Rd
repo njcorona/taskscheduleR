@@ -58,6 +58,7 @@ as the location of the rscript
 myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 cat(readLines(myscript), sep = "\\n")
 
+\dontrun{
 ## Run script once at a specific timepoint (within 62 seconds)
 runon <- format(Sys.time() + 62, "\%H:\%M")
 taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
@@ -83,9 +84,8 @@ taskscheduler_create(taskname = "myfancyscript_withargs_b", rscript = myscript,
   schedule = "MINUTE", rscript_args = c("productabc", "20150101"))
   
 alltasks <- taskscheduler_ls()
-\dontrun{
 subset(alltasks, TaskName \%in\% c("myfancyscript", "myfancyscriptdaily"))
-}
+# The field TaskName might have been different on Windows with non-english language locale
 
 taskscheduler_delete(taskname = "myfancyscript")
 taskscheduler_delete(taskname = "myfancyscriptdaily")
@@ -97,5 +97,6 @@ taskscheduler_delete(taskname = "myfancyscript_withargs_b")
 ## Have a look at the log
 mylog <- system.file("extdata", "helloworld.log", package = "taskscheduleR")
 cat(readLines(mylog), sep = "\\n")
+}
 }
 
