@@ -2,7 +2,7 @@ context("taskscheduler-examples")
 
 test_that("taskscheduleR examples can be scheduled as expected", {
   skip_on_cran()
-  library(taskscheduleR)
+
   myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
   
   ## run script once within 62 seconds
