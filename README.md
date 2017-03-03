@@ -1,7 +1,7 @@
 taskscheduleR
 =========
 
-![taskscheduleR](inst/img/taskscheduleR-logo.png) 
+![taskscheduleR](vignettes/taskscheduleR-logo.png) 
 
 Schedule R scripts/processes with the Windows task scheduler. This allows R users working on Windows to automate R processes on specific timepoints from R itself.
 Mark that if you are looking for a Linux/Unix scheduler, you might be interested in the R package cronR available at https://github.com/bnosac/cronR
@@ -74,7 +74,7 @@ RStudio add-in
 
 The package contains also an RStudio add-in. If you install the package and use RStudio version 0.99.893 or later you can just click to schedule a task. Just click Addins > Schedule R scripts on Windows. Many thanks to ![OliverBLMS](https://github.com/OliverBLMS) 
 
-![taskscheduleR](inst/img/taskscheduleR-rstudioaddin.png) 
+![taskscheduleR](vignettes/taskscheduleR-rstudioaddin.png) 
 
 Mark that the date format is the date format in Belgium. Change once to your locale if needed. E.g. in the US %m/%d/%Y
 
