@@ -29,4 +29,3 @@ taskcheduler_stop("myfancyscript")
 taskscheduler_delete(taskname = "myfancyscript")
 }
 }
-

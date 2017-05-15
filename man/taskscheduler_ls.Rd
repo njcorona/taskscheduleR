@@ -20,4 +20,3 @@ Get all the tasks which are currently scheduled at the Windows task scheduler.
 x <- taskscheduler_ls()
 x
 }
-

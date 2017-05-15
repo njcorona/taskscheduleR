@@ -24,4 +24,3 @@ task <- x$TaskName[1]
 taskscheduler_delete(taskname = task)
 }
 }
-

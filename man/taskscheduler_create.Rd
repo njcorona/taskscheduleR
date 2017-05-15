@@ -99,4 +99,3 @@ mylog <- system.file("extdata", "helloworld.log", package = "taskscheduleR")
 cat(readLines(mylog), sep = "\\n")
 }
 }
-
