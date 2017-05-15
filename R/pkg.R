@@ -9,6 +9,7 @@
 #' @docType package 
 #' @importFrom data.table setDF fread
 #' @importFrom tools file_path_sans_ext
+#' @importFrom utils read.csv
 NULL
 
 

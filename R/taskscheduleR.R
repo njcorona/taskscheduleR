@@ -15,7 +15,10 @@ taskscheduler_ls <- function(...){
   x <- system(cmd, intern = TRUE)
   f <- tempfile()
   writeLines(x, f)
-  x <- data.table::fread(f, ...)
+  x <- try(data.table::fread(f, ...), silent = TRUE)
+  if(inherits(x, "try-error")){
+    x <- utils::read.csv(f, check.names = FALSE, stringsAsFactors=FALSE, ...)
+  }
   x <- data.table::setDF(x)
   if("TaskName" %in% names(x)){
     try(x$TaskName <- gsub("^\\\\", "", x$TaskName), silent = TRUE)  

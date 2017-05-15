@@ -15,3 +15,10 @@ test_that("taskscheduleR examples can be scheduled as expected", {
   ## delete the tasks
   expect_warning(taskscheduler_delete(taskname = "myfancyscript"), NA)
 })
+
+
+
+test_that("taskscheduler_ls returns a data.frame", {
+  skip_on_cran()
+  expect_is(taskscheduler_ls(), "data.frame")
+})
