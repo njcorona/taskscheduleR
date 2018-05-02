@@ -27,10 +27,11 @@ Either one of 'ONCE', 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE', 'ONLOGON
 Only applicable if schedule is of type 'MONTHLY', 'WEEKLY', 'DAILY', 'HOURLY', 'MINUTE'. Defaults to today in '\%d/\%m/\%Y' format. Change to your locale format if needed.}
 
 \item{days}{character string with days on which to run the script if schedule is 'WEEKLY' or 'MONTHLY'. Possible values
-are * (all days), 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN', 1:31.}
+are * (all days). For weekly: 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN' or a vector of these in your locale.
+For monthly: 1:31 or a vector of these.}
 
 \item{months}{character string with months on which to run the script if schedule is 'MONTHLY'. Possible values
-are * (all months), 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'.}
+are * (all months) or 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC' or a vector of these in your locale.}
 
 \item{modifier}{a modifier to apply. See the docs/schtasks.pdf}
 
