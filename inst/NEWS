@@ -1,8 +1,9 @@
 Package: taskscheduleR
 ================
 
-Version: 1.2 [2018-05-02]
+Version: 1.2 [2018-09-01]
 - Allow multiple days to be scheduled in 1 time
+- Change Author to Authors@R in DESCRIPTION
 
 Version: 1.1 [2017-05-15]
 - Use read.csv as a backup procedure if fread fails

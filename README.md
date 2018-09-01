@@ -81,16 +81,10 @@ Mark that the date format is the date format in Belgium. Change once to your loc
 Install
 -----------
 
-Install the latest version from github:
-```
-devtools::install_github("bnosac/taskscheduleR")
-```
+The package is on CRAN. To install, just run:
 
-Or from www.datatailor.be
 ```
-install.packages('data.table')
-install.packages('knitr')
-install.packages("taskscheduleR", repos = "http://www.datatailor.be/rcube", type = "source")
+install.packages("taskscheduleR")
 ```
 
 If you want the RStudio add-in to work, also install miniUI and shiny
@@ -98,6 +92,9 @@ If you want the RStudio add-in to work, also install miniUI and shiny
 install.packages('miniUI')
 install.packages('shiny')
 ```
+
+For installing the development version of this package: `devtools::install_github("bnosac/taskscheduleR", build_vignettes = TRUE)`
+
 
 Mark on administrator rights
 -----------
