@@ -5,19 +5,21 @@
 #' 
 #' @return a data.frame with scheduled tasks as returned by schtasks /Query for which the Taskname or second
 #' column in the dataset the preceding \\ is removed
+#' @param encoding encoding of the CSV which schtasks.exe generates. Defaults to UTF-8.
 #' @param ... optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates
 #' @export
 #' @examples 
 #' x <- taskscheduler_ls()
 #' x
-taskscheduler_ls <- function(...){
+taskscheduler_ls <- function(encoding = 'UTF-8', ...){
+  change_code_page <- system("chcp 65001", intern = TRUE)
   cmd <- sprintf('schtasks /Query /FO CSV /V')
   x <- system(cmd, intern = TRUE)
   f <- tempfile()
   writeLines(x, f)
-  x <- try(data.table::fread(f, ...), silent = TRUE)
+  x <- try(data.table::fread(f, encoding = encoding, ...), silent = TRUE)
   if(inherits(x, "try-error")){
-    x <- utils::read.csv(f, check.names = FALSE, stringsAsFactors=FALSE, ...)
+    x <- utils::read.csv(f, check.names = FALSE, stringsAsFactors=FALSE, encoding = encoding, ...)
   }
   x <- data.table::setDF(x)
   if("TaskName" %in% names(x)){

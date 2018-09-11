@@ -4,9 +4,11 @@
 \alias{taskscheduler_ls}
 \title{Get all the tasks which are currently scheduled at the Windows task scheduler.}
 \usage{
-taskscheduler_ls(...)
+taskscheduler_ls(encoding = "UTF-8", ...)
 }
 \arguments{
+\item{encoding}{encoding of the CSV which schtasks.exe generates. Defaults to UTF-8.}
+
 \item{...}{optional arguments passed on to \code{fread} in order to read in the CSV file which schtasks generates}
 }
 \value{
