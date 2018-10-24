@@ -203,21 +203,23 @@ taskscheduler_delete <- function(taskname){
 #' 
 #' @param taskname the name of the task to run. See the example.
 #' @return the system call to schtasks /Run 
-#' @export
+#' @export taskscheduler_runnow
+#' @export taskcheduler_runnow
+#' @aliases taskcheduler_runnow
 #' @examples 
 #' \dontrun{
 #' myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 #' taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
 #'  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "%H:%M"))
 #' 
-#' taskcheduler_runnow("myfancyscript")
+#' taskscheduler_runnow("myfancyscript")
 #' Sys.sleep(5)
-#' taskcheduler_stop("myfancyscript")
+#' taskscheduler_stop("myfancyscript")
 #' 
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
 #' }
-taskcheduler_runnow <- function(taskname){
+taskscheduler_runnow <- function(taskname){
   cmd <- sprintf('schtasks /Run /TN %s', shQuote(taskname, type = "cmd"))
   system(cmd, intern = FALSE)
 }
@@ -228,23 +230,34 @@ taskcheduler_runnow <- function(taskname){
 #' 
 #' @param taskname the name of the task to stop. See the example.
 #' @return the system call to schtasks /End 
-#' @export
+#' @export taskscheduler_stop
+#' @export taskcheduler_stop
+#' @aliases taskcheduler_stop
 #' @examples 
 #' \dontrun{
 #' myscript <- system.file("extdata", "helloworld.R", package = "taskscheduleR")
 #' taskscheduler_create(taskname = "myfancyscript", rscript = myscript, 
 #'  schedule = "ONCE", starttime = format(Sys.time() + 10*60, "%H:%M"))
 #' 
-#' taskcheduler_runnow("myfancyscript")
+#' taskscheduler_runnow("myfancyscript")
 #' Sys.sleep(5)
-#' taskcheduler_stop("myfancyscript")
+#' taskscheduler_stop("myfancyscript")
 #' 
 #' 
 #' taskscheduler_delete(taskname = "myfancyscript")
 #' }
-taskcheduler_stop <- function(taskname){
+taskscheduler_stop <- function(taskname){
   cmd <- sprintf('schtasks /End /TN %s', shQuote(taskname, type = "cmd"))
   system(cmd, intern = FALSE)
 }
 
 
+taskcheduler_stop <- function(taskname){
+  .Deprecated("taskscheduler_stop", msg = "Use taskscheduler_stop instead of taskcheduler_stop")
+  taskscheduler_stop(taskname)
+} 
+
+taskcheduler_runnow <- function(taskname){
+  .Deprecated("taskscheduler_stop", msg = "Use taskscheduler_runnow instead of taskcheduler_runnow")
+  taskscheduler_runnow(taskname)
+}

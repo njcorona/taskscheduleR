@@ -1,6 +1,9 @@
 Package: taskscheduleR
 ================
 
+Version: 1.4 [2018-10-24]
+- Rename taskcheduler_stop to taskscheduler_stop and taskcheduler_runnow to taskscheduler_runnow
+
 Version: 1.3 [2018-09-11]
 - Change codepage to UTF-8 (using chcp 65001) in taskscheduler_ls
 
