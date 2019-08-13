@@ -13,6 +13,11 @@
 #' 
 #' 
 
+library(shinyjs)
+library(shinyTime)
+library(miniUI)
+library(shiny)
+
 getDateFormat <- function(dateformat) {
   if (dateformat == "%m/%Y/%d") { return("mm-yyyy-dd") } else
     if (dateformat == "%d/%Y/%m") { return("dd-yyyy-mm") } else
@@ -28,6 +33,7 @@ taskschedulerAddin <- function(RscriptRepository,
   requireNamespace("shiny")
   requireNamespace("miniUI")
   requireNamespace("shinyjs")
+  requireNamespace("shinyTime")
   current_repo <- file.path(system.file("extdata", package="taskscheduleR"), "RscriptRepository.rds")
   if(missing(RscriptRepository)){
     if(file.exists(current_repo)){
@@ -50,13 +56,13 @@ taskschedulerAddin <- function(RscriptRepository,
   ui <- miniUI::miniPage(useShinyjs(),
                          # Shiny fileinput resethandler
                          shiny::tags$script('
-                       Shiny.addCustomMessageHandler("resetFileInputHandler", function(x) {
-                       var id = "#" + x + "_progress";
-                       var idBar = id + " .bar";
-                       $(id).css("visibility", "hidden");
-                       $(idBar).css("width", "0%");
-                       });
-                       '),
+                           Shiny.addCustomMessageHandler("resetFileInputHandler", function(x) {
+                           var id = "#" + x + "_progress";
+                           var idBar = id + " .bar";
+                           $(id).css("visibility", "hidden");
+                           $(idBar).css("width", "0%");
+                           });
+                           '),
                          
                          miniUI::gadgetTitleBar("Schedule your R scripts quickly and easily!"),
                          
@@ -77,14 +83,15 @@ taskschedulerAddin <- function(RscriptRepository,
                                                                                           shiny::radioButtons('frequency', label = "Schedule:", choices = c('Once', 'Every minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'On log-on', 'On idle')),
                                                                                           shiny::fillCol(
                                                                                             shiny::dateInput('startdate', label = "Start date:", startview = "month", weekstart = 1, min = Sys.Date(), format = getDateFormat(datefmt)),
-                                                                                            shiny::textInput('hour', label = "Start time (24-hr):", placeholder = "23:59"),
+                                                                                            #shiny::textInput('hour', label = "Start time (24-hr):", placeholder = "23:59"),
+                                                                                            timeInput('hour', label = "Start time (24-hr):", value = Sys.time() + 3600, seconds = FALSE),
                                                                                             shiny::textInput('rscript_args', label = "Additional arguments to your R script:", value = ""),
                                                                                             shiny::selectInput('date_fmt', label = "Date format of your device:", choices = c("%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%Y/%d/%m", "%d/%Y/%m", "%m/%Y/%d"), multiple = FALSE, selected = datefmt)                                                           
                                                                                           )
                                                                                         ),
                                                                                         shiny::fillRow(
                                                                                           shiny::uiOutput('days_weekly'),
-                                                                                          shiny::numericInput(inputId = 'idletime', label = "The amount of idle time to wait before running a scheduled ONIDLE task", min = 1, max = 999, value = 1, step = 1)
+                                                                                          shiny::numericInput(inputId = 'idletime', label = "The amount of idle time, in minutes, to wait before running a scheduled ONIDLE task:", min = 1, max = 999, value = 1, step = 1)
                                                                                         ),
                                                                                         shiny::fillRow(
                                                                                           shiny::uiOutput('days_monthly'),
@@ -125,17 +132,17 @@ taskschedulerAddin <- function(RscriptRepository,
     # UI ELEMENT FOR DAYS OF THE WEEK (MON-SUN)
     output$days_weekly <- shiny::renderUI({
       shiny::checkboxGroupInput(inputId = 'daysoftheweek', label = 'Choose days of the week to run task.', 
-                                choices = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
+                                choices = c("All", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
     })
     
     # UI ELEMENT FOR DAYS OF THE MONTH (1-31)
     output$days_monthly <- shiny::renderUI({
-      shiny::checkboxGroupInput(inputId = 'daysofthemonth', label = 'Choose days of the month to run task.', choices = c(" 1", " 2", " 3", " 4", " 5", " 6", " 7"," 8", " 9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"), inline = TRUE, width = "175px")
+      shiny::checkboxGroupInput(inputId = 'daysofthemonth', label = 'Choose days of the month to run task.', choices = c("All", "1", " 2", " 3", " 4", " 5", " 6", " 7"," 8", " 9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"), inline = TRUE, width = "175px")
     })
     
     # UI ELEMENTS FOR MONTHS OF THE YEAR (JAN-DEC)
     output$months <- shiny::renderUI({
-      shiny::checkboxGroupInput(inputId = 'monthsoftheyear', label = 'Choose months of the year to run task.', choices = c("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), inline = TRUE)
+      shiny::checkboxGroupInput(inputId = 'monthsoftheyear', label = 'Choose months of the year to run task.', choices = c("All", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"), inline = TRUE)
     })
     
     ##########################
@@ -153,10 +160,37 @@ taskschedulerAddin <- function(RscriptRepository,
                   input$file$name)
         } else {
           check <<- FALSE
-          sprintf("No tasks exist for %s.",
+          sprintf("No tasks exist for %s.  A new task will be created for %s.",
                   input$file$name)
         }
       })
+    })
+    
+    # EVENT LISTENER:  CONTROL "ALL" FOR DAYS OF THE MONTH
+    shiny::observeEvent(input$daysofthemonth, {
+      if ("All" %in% input$daysofthemonth) {
+        shiny::updateCheckboxGroupInput(session, 'daysofthemonth', selected = c("All", "1", " 2", " 3", " 4", " 5", " 6", " 7"," 8", " 9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"))
+      } else if (!("All" %in% input$daysofthemonth) & length(input$daysofthemonth) == 31) {
+        shiny::updateCheckboxGroupInput(session, 'daysofthemonth', selected = character(0))
+      } 
+    })
+    
+    # EVENT LISTENER:  CONTROL "ALL" FOR DAYS OF THE WEEK
+    shiny::observeEvent(input$daysoftheweek, {
+      if ("All" %in% input$daysoftheweek) {
+        shiny::updateCheckboxGroupInput(session, 'daysoftheweek', selected = c("All", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
+      } else if (!("All" %in% input$daysoftheweek) & length(input$daysoftheweek) == 7) {
+        shiny::updateCheckboxGroupInput(session, 'daysoftheweek', selected = character(0))
+      } 
+    })
+    
+    # EVENT LISTENER:  CONTROL "ALL" FOR MONTHS OF THE YEAR
+    shiny::observeEvent(input$monthsoftheyear, {
+      if ("All" %in% input$monthsoftheyear) {
+        shiny::updateCheckboxGroupInput(session, 'monthsoftheyear', selected = c("All", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"))
+      } else if (!("All" %in% input$monthsoftheyear) & length(input$monthsoftheyear) == 12) {
+        shiny::updateCheckboxGroupInput(session, 'monthsoftheyear', selected = character(0))
+      } 
     })
     
     # EVENT LISTENER:  UPDATE BUTTONS GIVEN TASK FREQUENCY
@@ -168,37 +202,46 @@ taskschedulerAddin <- function(RscriptRepository,
       disable('days_monthly')
       disable('months')
       disable('startdate')
+      disable('hour')
       disable('idletime')
       updateTextInput(session, inputId = 'idletime', label = NULL, value = "", placeholder = NULL)
       
       if (input$frequency == "Once") {
         enable('startdate') # SHOULD THIS BE ENABLED?
+        enable('hour')
       }
       if (input$frequency == "Every minute") {
+        enable('hour')
         enable('startdate')
       }
       if (input$frequency == "Hourly") {
+        enable('hour')
         enable('startdate')
       }
       if (input$frequency == "Daily") {
+        enable('hour')
         enable('startdate')
       }
       if (input$frequency == "Weekly") {
+        enable('hour')
         enable('days_weekly')
         enable('startdate')
       }
       if (input$frequency == "Monthly") {
         # MAKE SURE THAT HAVING A BLANK DATE IS HANDLED
+        enable('hour')
         enable('days_monthly')
         enable('months')
         enable('startdate')
       }
       if (input$frequency == 'On log-on') {
-        updateDateInput(session, inputId = 'startdate', label = NULL, value = NA, min = NULL, max = NULL)
+        updateTimeInput(session, inputId = 'hour', label = NULL, value = paste(Sys.Date(), " 00:00:00 EDT", sep = ""))
+        updateDateInput(session, inputId = 'startdate', label = NULL, value = Sys.Date(), min = NULL, max = NULL)
         
       }
       if (input$frequency == "On idle") {
-        updateDateInput(session, inputId = 'startdate', label = NULL, value = NA, min = NULL, max = NULL)
+        updateTimeInput(session, inputId = 'hour', label = NULL, value = paste(Sys.Date(), " 00:00:00 EDT", sep = ""))
+        updateDateInput(session, inputId = 'startdate', label = NULL, value = Sys.Date(), min = NULL, max = NULL)
         updateTextInput(session, inputId = 'idletime', label = NULL, value = 1, placeholder = NULL)
         enable('idletime')
       }
@@ -245,6 +288,7 @@ taskschedulerAddin <- function(RscriptRepository,
     shiny::observeEvent(input$date_fmt, {
       datefmt <<- input$date_fmt
       saveRDS(datefmt, file = local_dateformat)
+      print(input$startdate)
     })
     
     ############################
@@ -255,28 +299,48 @@ taskschedulerAddin <- function(RscriptRepository,
       shiny::req(input$frequency)
       shiny::req(input$file)
       shiny::req(input$taskname)
-      if (input$frequency == "Monthly" ) {
-        days <- format(input$date, "%d")
-      } else if (input$frequency == "Weekly") {
-        weekdays <- c("MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN")
-        idx <- as.integer(format(input$date, "%w"))
-        print(idx)
-        days <- weekdays[ifelse(idx == 0, 7, idx)]
-      } else {
-        # get default value by setting days to null.
-        days <- NULL
-      }
       
-      input$frequency <- gsub(" ", "", input$frequency, fixed = TRUE)
-      input$frequency <- gsub("-", "", input$frequency, fixed = TRUE)
-      input$frequency <- toupper(input$frequency)
-      
+      # Set fields appropriate for schedule/frequency.
       starttime <- input$hour
       rscript_args <- input$rscript_args
+      days <- NULL # Only not null if schedule is weekly or monthly.
+      months <- NULL # Only not null if schedule is monthly.
+      startdate <- NULL # Only not null if schedule is monthly, weekly, daily, hourly, or by minute.
+      # ^^^ DOES STARTDATE APPLY FOR THE "ONCE" SCHEDULE OPTION?
+      idletime <- NULL # Only not null if on idle.
       
-      ##
-      ## Copy the uploaded file from the webapp to the main folder to store the scheduled rscripts.
-      ##
+      if (length(input$startdate) == 0) {
+        input$startdate <- Sys.Date()
+      }
+      
+      if (input$frequency == "Once") {
+        
+      }
+      if (input$frequency == "Every minute") {
+      }
+      if (input$frequency == "Hourly") {
+      }
+      if (input$frequency == "Daily") {
+      }
+      if (input$frequency == "Weekly") {
+        weekdays <- input$daysoftheweek[which(input$daysoftheweek != "All")]
+        weekdays <- toupper(weekdays)
+      }
+      if (input$frequency == "Monthly") {
+        days <- as.numeric(input$daysofthemonths[which(input$daysofthemonth != "All")])
+        months <- input$monthsoftheyear[which(input$monthsoftheyear != "All")]
+      }
+      if (input$frequency == 'On log-on') {
+      }
+      if (input$frequency == "On idle") {
+      }
+      
+      # Convert "On log-on" to "ONLOGON" and "On idle" to "ONIDLE" 
+      frequency <- gsub(" ", "", input$frequency, fixed = TRUE)
+      frequency <- gsub("-", "", frequency, fixed = TRUE)
+      frequency <- toupper(frequency)
+      
+      # Copy the uploaded file from the webapp to the main folder to store the scheduled rscripts.
       if(length(grep(" ", RscriptRepository)) > 0){
         stop(sprintf("Make sure the RscriptRepository does not contain spaces, change argument %s to another location on your drive which contains no spaces", RscriptRepository))
       }
@@ -285,16 +349,14 @@ taskschedulerAddin <- function(RscriptRepository,
       if(!done){
         stop(sprintf('Copying file %s to %s failed. Do you have access rights to %s?', file.path(input$file$datapath, input$file$name), myscript, dirname(myscript)))
       }
-      ##
-      ## Make schedule task
-      ##
-      if(check){
-        taskscheduler_delete(taskname = input$file$name)
-        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$frequency, startdate = format(input$date, input$date_fmt), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
-      } else {
-        taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = input$frequency, startdate = format(input$date, input$date_fmt), starttime = starttime, days = days, rscript_args = rscript_args, debug = debug)
-      }
       
+      # Make schedule task - UPDATE TO USE TASK NAME INSTEAD OF FILE NAME LATER
+      if(check) {
+        taskscheduler_delete(taskname = input$file$name)
+      }
+      taskscheduler_create(taskname = input$file$name, rscript = myscript, schedule = frequency, startdate = format(input$date, input$date_fmt), starttime = starttime, days = days, months = months, rscript_args = rscript_args, debug = debug, idletime = input$idletime)
+      
+      print("GOTHERE")
       # Reset ui inputs
       shiny::updateDateInput(session, inputId = 'startdate', value = Sys.Date())
       shiny::updateRadioButtons(session, inputId = 'frequency', selected = "Once")
