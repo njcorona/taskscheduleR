@@ -13,50 +13,56 @@
 #' 
 #' 
 
+library(shiny)
 library(shinyjs)
 library(shinyTime)
-library(miniUI)
-library(shiny)
-library(taskscheduleR)
+library(shinythemes)
+library(miniUI) # TODO: Delete - shouldn't be necessary.
+library(taskscheduleR) # TODO: Delete before testing.
 
 getDateFormat <- function(dateformat) {
   if (dateformat == "%m/%Y/%d") { return("mm-yyyy-dd") } else
     if (dateformat == "%d/%Y/%m") { return("dd-yyyy-mm") } else
-      if (dateformat == "%Y/%d/%m") {return("yyyy-dd-mm")} else 
-        if (dateformat == "%Y/%m/%d") {return("yyyy-mm-dd")} else
-          if (dateformat == "%m/%d/%Y") {return("mm-dd-yyyy")} else
-            if (dateformat == "%d/%m/%Y") {return("dd-mm-yyyy")}
+      if (dateformat == "%Y/%d/%m") { return("yyyy-dd-mm") } else 
+        if (dateformat == "%Y/%m/%d") { return("yyyy-mm-dd") } else
+          if (dateformat == "%m/%d/%Y") { return("mm-dd-yyyy") } else
+            if (dateformat == "%d/%m/%Y") { return("dd-mm-yyyy") }
 }
 
 
-taskschedulerAddin <- function(RscriptRepository, 
-                                debug = TRUE) {
+taskschedulerAddinx <- function(RscriptRepository, debug = TRUE) {
   requireNamespace("shiny")
-  requireNamespace("miniUI")
+  requireNamespace("miniUI") # TODO: Delete.
   requireNamespace("shinyjs")
   requireNamespace("shinyTime")
+  requireNamespace("shinythemes")
+  
   current_repo <- file.path(system.file("extdata", package="taskscheduleR"), "RscriptRepository.rds")
-  if(missing(RscriptRepository)){
-    if(file.exists(current_repo)){
+  
+  if (missing(RscriptRepository)) {
+    if (file.exists(current_repo)) {
       RscriptRepository <- readRDS(file = current_repo)
-    }else{
+    } else {
       RscriptRepository <- system.file("extdata", package="taskscheduleR")
       saveRDS(RscriptRepository, file = current_repo)
     }
   }
+  
   local_dateformat <- file.path(system.file("extdata", package="taskscheduleR"), "dateformat.rds")
-  if(file.exists(local_dateformat)){
+  
+  if (file.exists(local_dateformat)) {
     datefmt <- readRDS(file = local_dateformat)
-  }else{
+  } else {
     datefmt <- "%d/%m/%Y"
     saveRDS(datefmt, file = local_dateformat)
   }
   
   check <- NULL
   
-  ui <- miniUI::miniPage(useShinyjs(),
-                         # Shiny fileinput resethandler
-                         shiny::tags$script('
+  ui <- shiny::fluidPage(
+    useShinyjs(),
+    # Shiny fileinput resethandler
+    shiny::tags$script('
                            Shiny.addCustomMessageHandler("resetFileInputHandler", function(x) {
                            var id = "#" + x + "_progress";
                            var idBar = id + " .bar";
@@ -64,56 +70,51 @@ taskschedulerAddin <- function(RscriptRepository,
                            $(idBar).css("width", "0%");
                            });
                            '),
-                         
-                         miniUI::gadgetTitleBar("Schedule your R scripts quickly and easily!"),
-                         
-                         ## Your UI items go here.
-                         miniUI::miniTabstripPanel(
-                           miniUI::miniTabPanel(title = 'Create Tasks', icon = shiny::icon("plus-circle"),
-                                                miniUI::miniContentPanel(scrollable = TRUE,
-                                                                         shiny::fillCol(flex = c(10, 10, 30, 25, 25), height = "1000px",
-                                                                                        shiny::fillRow(
-                                                                                          shiny::uiOutput('fileSelect'),
-                                                                                          miniUI::miniContentPanel(padding = 0, shiny::strong("Task Check"), shiny::textOutput("text"), scrollable = TRUE)
-                                                                                        ),
-                                                                                        shiny::fillRow(
-                                                                                          shiny::textInput('rscript_repository', label = "Specify a repository to store task logs.", value = RscriptRepository), 
-                                                                                          shiny::textInput('taskname', label = "Choose a name for your task.", placeholder = "task_name")
-                                                                                        ),
-                                                                                        shiny::fillRow(
-                                                                                          shiny::radioButtons('frequency', label = "Schedule:", choices = c('Once', 'Every minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'On log-on', 'On idle')),
-                                                                                          shiny::fillCol(
-                                                                                            shiny::dateInput('startdate', label = "Start date:", startview = "month", weekstart = 1, min = Sys.Date(), format = getDateFormat(datefmt)),
-                                                                                            #shiny::textInput('hour', label = "Start time (24-hr):", placeholder = "23:59"),
-                                                                                            timeInput('hour', label = "Start time (24-hr):", value = Sys.time() + 3600, seconds = FALSE),
-                                                                                            shiny::textInput('rscript_args', label = "Additional arguments to your R script:", value = ""),
-                                                                                            shiny::selectInput('date_fmt', label = "Date format of your device:", choices = c("%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%Y/%d/%m", "%d/%Y/%m", "%m/%Y/%d"), multiple = FALSE, selected = datefmt)                                                           
-                                                                                          )
-                                                                                        ),
-                                                                                        shiny::fillRow(
-                                                                                          shiny::uiOutput('days_weekly'),
-                                                                                          shiny::numericInput(inputId = 'idletime', label = "The amount of idle time, in minutes, to wait before running a scheduled ONIDLE task:", min = 1, max = 999, value = 1, step = 1)
-                                                                                        ),
-                                                                                        shiny::fillRow(
-                                                                                          shiny::uiOutput('days_monthly'),
-                                                                                          shiny::uiOutput('months')
-                                                                                        )
-                                                                         ),
-                                                                         miniUI::miniButtonBlock(border = "bottom",
-                                                                                                 shiny::actionButton('create', "Create task", icon = shiny::icon("play-circle"))
-                                                                         )
-                                                )
-                           ),
-                           miniUI::miniTabPanel(title = 'Stop or Delete Tasks', icon = shiny::icon("table"),
-                                                miniUI::miniContentPanel(
-                                                  shiny::uiOutput("getFiles")
-                                                ),
-                                                miniUI::miniButtonBlock(border = "bottom",
-                                                                        shiny::actionButton('Stop', "Stop task", icon = shiny::icon("stop")),
-                                                                        shiny::actionButton('Delete', "Delete task", icon = shiny::icon("remove"))
-                                                )
-                           )
+    theme = shinytheme("lumen"),
+    titlePanel("Schedule your R scripts quickly and easily!"),
+    # Input
+    sidebarLayout(
+      #sidebarPanel(
+        shiny::fillCol(flex = c(5, 5, 25, 20, 20, 5, 5, 5, 5), height = "1000px",
+                       shiny::fillRow(
+                         shiny::uiOutput('fileSelect'),
+                         shiny::strong("Task Check"),
+                         shiny::textOutput("text")
+                       ),
+                       shiny::fillRow(
+                         shiny::textInput('rscript_repository', label = "Specify a repository to store task logs.", value = RscriptRepository), 
+                         shiny::textInput('taskname', label = "Choose a name for your task.", placeholder = "task_name")
+                       ),
+                       shiny::fillRow(
+                         shiny::radioButtons('frequency', label = "Schedule:", choices = c('Once', 'Every minute', 'Hourly', 'Daily', 'Weekly', 'Monthly', 'On log-on', 'On idle')),
+                         shiny::fillCol(
+                           shiny::dateInput('startdate', label = "Start date:", startview = "month", weekstart = 1, min = Sys.Date(), format = getDateFormat(datefmt)),
+                           #shiny::textInput('hour', label = "Start time (24-hr):", placeholder = "23:59"),
+                           timeInput('hour', label = "Start time (24-hr):", value = Sys.time() + 3600, seconds = FALSE),
+                           shiny::textInput('rscript_args', label = "Additional arguments to your R script:", value = ""),
+                           shiny::selectInput('date_fmt', label = "Date format of your device:", choices = c("%d/%m/%Y", "%m/%d/%Y", "%Y/%m/%d", "%Y/%d/%m", "%d/%Y/%m", "%m/%Y/%d"), multiple = FALSE, selected = datefmt)                                                           
                          )
+                       ),
+                       shiny::fillRow(
+                         shiny::uiOutput('days_weekly'),
+                         shiny::numericInput(inputId = 'idletime', label = "The amount of idle time, in minutes, to wait before running a scheduled ONIDLE task:", min = 1, max = 999, value = 1, step = 1)
+                       ),
+                       shiny::fillRow(
+                         shiny::uiOutput('days_monthly'),
+                         shiny::uiOutput('months')
+                       ),
+                       shiny::actionButton('create', "Create task", icon = shiny::icon("play-circle")),
+                       shiny::uiOutput("getFiles"),
+                       shiny::actionButton('Stop', "Stop task", icon = shiny::icon("stop")),
+                       shiny::actionButton('Delete', "Delete task", icon = shiny::icon("remove"))
+        ),
+        # Output:
+        mainPanel(
+          shiny::uiOutput('fileSelect')
+        )
+      #)
+    ),
+    
   )
   
   # Server code for the gadget.
@@ -280,10 +281,10 @@ taskschedulerAddin <- function(RscriptRepository,
             }
           }
           close(con)
-        }
+          }
         processFile(paste(system.file("extdata", package="taskscheduleR"), "/tasknames.txt"))
       }
-    })
+  })
     
     # EVENT LISTENER:  UPDATE DATE FORMAT
     shiny::observeEvent(input$date_fmt, {
@@ -410,7 +411,7 @@ taskschedulerAddin <- function(RscriptRepository,
       # the gadget is closed after 'done' is clicked.
       shiny::stopApp()
     })
-  }
+    }
   
   # Use a modal dialog as a viewr.
   viewer <- shiny::dialogViewer("Task ScheduleR", width = 700, height = 600)
